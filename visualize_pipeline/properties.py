@@ -2,11 +2,26 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from .exceptions import PropertiesKeyError
+
 class PropertiesTree(dict):
     def __getitem__(self, key):
         if key in self:
             return self.get(key)
         return self.setdefault(key, PropertiesTree())
+
+class Properties(object):
+    def __init__(self, tree):
+        self.tree = tree
+
+    def get_properties_of(self, key, subkey):
+        if self.tree.get(key):
+            return self.tree[key].get(subkey, None)
+        else:
+            raise PropertiesKeyError(key)
+
+    def update_properties_of(self, key, subkey, value):
+        self.tree[key][subkey] = value
 
 def parse(body):
     """Parse properties file content into a Properties object."""
