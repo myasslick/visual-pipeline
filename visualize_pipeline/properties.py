@@ -34,6 +34,12 @@ class Properties(object):
     def get_aws_properties(self):
         return self._get_properties_of(("aws",))
 
+    def get_feed_activities(self):
+        return self._get_properties_of(("feed", "activity"))
+
+    def count_feed_activities(self):
+        return len(self._get_properties_of(("feed", "activity")))
+
 def parse(body):
     """Parse properties file content into a Properties object."""
     properties = PropertiesTree()
