@@ -27,28 +27,42 @@ class TestPropertiesParser(unittest.TestCase):
         self.assertEqual(pp["feed"]["Id"], "ExampleFeed")
 
 class TestPropertiesClass(unittest.TestCase):
-    def assertPropertiesKeyError(self, ppi, key, subkey):
+    def assertPropertiesKeyError(self, pp_method):
         self.assertRaises(vs_exceptions.PropertiesKeyError,
-            ppi.get_properties_of, key, subkey)
+            pp_method)
 
-    def test_empty_properties_tree_lookup_raised_error(self):
+    def test_keyerror_on_empty_tree(self):
         tree = properties.PropertiesTree()
         pp = properties.Properties(tree)
-        self.assertPropertiesKeyError(pp, "pieline", "name")
-        self.assertPropertiesKeyError(pp, "pipeline", "id")
+        self.assertPropertiesKeyError(pp.get_feed_properties)
+
+    def test_keyerror_on_non_existent_key(self):
+        tree = properties.PropertiesTree()
+        tree["feed"]["id"] = "Test"
+        pp = properties.Properties(tree)
+
+        # error message check + exception check
+        error_msg = vs_exceptions.PropertiesKeyError.MESSAGE.format(
+                key="feed.name")
+        self.assertRaisesRegexp(
+                vs_exceptions.PropertiesKeyError,
+                error_msg,
+                pp._get_properties_of,
+                ["feed", "name"]
+        )
 
     def test_add_pipeline_name_to_empty_properties_tree(self):
         tree = properties.PropertiesTree()
         pp = properties.Properties(tree)
-        pp.update_properties_of("pipeline", "name", "Test")
+        pp.update_properties_of("feed", "id", "Test")
         self.assertEqual(
-            pp.get_properties_of("pipeline", "name"), "Test")
+            pp.get_feed_properties()["id"], "Test")
 
     def test_get_a_properties_from_non_empty_properties_tree(self):
-        tree = properties.parse("pipeline.name=Test")
+        tree = properties.parse("feed.id=Test")
         pp = properties.Properties(tree)
         self.assertEqual(
-            pp.get_properties_of("pipeline", "name"), "Test")
+            pp.get_feed_properties()["id"], "Test")
 
 if __name__ == "__main__":
     unittest.main()

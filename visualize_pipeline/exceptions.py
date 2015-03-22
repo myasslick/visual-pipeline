@@ -7,8 +7,8 @@ class PropertiesError(Exception):
     pass
 
 class PropertiesKeyError(PropertiesError):
-    CUSTOM_MESSAGE = "No '{key}' defined in properties."
+    MESSAGE = "No '{key}' defined in properties."
     def __init__(self, key):
-        self.msg = self.CUSTOM_MESSAGE.format(key=key)
+        self.msg = self.MESSAGE.format(key=key)
         self.key = key
         super(PropertiesError, self).__init__(self.msg)

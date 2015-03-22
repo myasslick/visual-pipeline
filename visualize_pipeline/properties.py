@@ -14,14 +14,25 @@ class Properties(object):
     def __init__(self, tree):
         self.tree = tree
 
-    def get_properties_of(self, key, subkey):
-        if self.tree.get(key):
-            return self.tree[key].get(subkey, None)
-        else:
-            raise PropertiesKeyError(key)
+    def _get_properties_of(self, keys):
+        walked = []
+        subtree = self.tree
+        for key in keys:
+            walked.append(key)
+            subtree = subtree.get(key)
+            if subtree is None:
+                raise PropertiesKeyError(".".join(walked))
+        return subtree
 
     def update_properties_of(self, key, subkey, value):
         self.tree[key][subkey] = value
+
+    def get_feed_properties(self):
+        feed = self._get_properties_of(("feed",))
+        return feed
+
+    def get_aws_properties(self):
+        return self._get_properties_of(("aws",))
 
 def parse(body):
     """Parse properties file content into a Properties object."""
